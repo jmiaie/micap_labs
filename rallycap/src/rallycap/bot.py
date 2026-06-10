@@ -18,6 +18,7 @@ from typing import Dict, List, Optional
 from .config import BotConfig
 from .execution.broker import Broker, PaperBroker, PolymarketBroker
 from .fair_value import compute_fair_value
+from .feeds import teams
 from .feeds.mlb_statsapi import MlbStatsFeed
 from .feeds.polymarket import ClobMarketData, GammaClient
 from .feeds.sharp_odds import NullSharpOdds, SharpOddsSource
@@ -60,24 +61,39 @@ class Bot:
 
     # ------------------------------------------------------------- discovery
     def discover(self, date: Optional[str] = None) -> List[TrackedGame]:
-        """Match today's MLB schedule to Polymarket game-winner markets.
-
-        TODO(M1): robust team-name matching between Gamma outcome labels and
-        Stats API team names (nicknames, City vs Team forms, doubleheaders).
-        v0 matches on case-insensitive substring of the team nickname.
+        """Match the day's MLB schedule to Polymarket game-winner markets by
+        canonical team identity (feeds/teams.py): a Gamma event is accepted
+        for a game only when its two outcome labels resolve to exactly that
+        game's home/away teams. Doubleheaders (same team pair twice in one
+        day) are skipped — outcome labels can't distinguish game 1 from
+        game 2, and a wrong join would trade the wrong game.
         """
         date = date or dt.date.today().isoformat()
         schedule = self.games_feed.schedule(date)
         events = self.gamma.list_mlb_events(closed=False)
+
+        pair_counts: Dict[frozenset, int] = {}
         for game in schedule:
+            pair = teams.team_pair(game["home_name"], game["away_name"])
+            if pair is not None:
+                pair_counts[pair] = pair_counts.get(pair, 0) + 1
+
+        for game in schedule:
+            pair = teams.team_pair(game["home_name"], game["away_name"])
+            if pair is None:
+                log.warning("gamePk %s: unrecognized teams %s / %s — skipping",
+                            game["game_pk"], game["away_name"], game["home_name"])
+                continue
+            if pair_counts[pair] > 1:
+                log.warning("gamePk %s: doubleheader (%s) — skipping, cannot "
+                            "disambiguate markets", game["game_pk"], sorted(pair))
+                continue
             for event in events:
-                title = (event.get("title") or "").lower()
-                home_nick = game["home_name"].split()[-1].lower()
-                away_nick = game["away_name"].split()[-1].lower()
-                if home_nick in title and away_nick in title:
-                    market = self.gamma.parse_game_market(event, game["game_pk"])
-                    if market is not None:
-                        self.tracked[game["game_pk"]] = TrackedGame(market=market)
+                market = self.gamma.parse_game_market(
+                    event, game["game_pk"], game["home_name"], game["away_name"]
+                )
+                if market is not None:
+                    self.tracked[game["game_pk"]] = TrackedGame(market=market)
                     break
         log.info("discovery: tracking %d markets for %s", len(self.tracked), date)
         return list(self.tracked.values())

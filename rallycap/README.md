@@ -78,7 +78,7 @@ src/rallycap/
 ├── signals.py         entry gates & exit priority (pure functions)
 ├── kelly.py           fractional Kelly sizing, multi-outcome optimizer
 ├── risk.py            caps, kill switch, size approval
-├── feeds/             Polymarket Gamma/CLOB, MLB Stats API, sharp odds
+├── feeds/             Polymarket Gamma/CLOB, MLB Stats API, team matching, sharp odds
 ├── execution/         PaperBroker (default) + gated PolymarketBroker
 ├── backtest/          event-driven engine + synthetic game simulator
 ├── bot.py             paper/live polling loop, persistence, trade log

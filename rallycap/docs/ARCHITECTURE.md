@@ -48,6 +48,8 @@ rallycap/
 │   ├── kelly.py                Kelly math + numeric multi-outcome optimizer
 │   ├── risk.py                 Portfolio caps, daily kill switch, sizing approval
 │   ├── feeds/
+│   │   ├── teams.py            canonical MLB team table; identity matching for
+│   │   │                       joining Stats API names to Gamma outcome labels
 │   │   ├── polymarket.py       Gamma discovery + CLOB book client (httpx, lazy)
 │   │   ├── mlb_statsapi.py     statsapi.mlb.com schedule + live feed parser
 │   │   └── sharp_odds.py       SharpOddsSource protocol, de-vig math, Null impl

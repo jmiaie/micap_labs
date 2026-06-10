@@ -16,6 +16,7 @@ import logging
 import time
 from typing import Any, List, Optional
 
+from . import teams
 from ..types import BookTop, Market
 
 log = logging.getLogger(__name__)
@@ -54,10 +55,17 @@ class GammaClient:
         return resp.json()
 
     @staticmethod
-    def parse_game_market(event: dict, game_pk: int) -> Optional[Market]:
-        """Build a `Market` from a Gamma event known to be a game-winner
-        market for `game_pk` (the caller does team/date matching; see
-        bot.discover). Returns None when the event shape is unexpected."""
+    def parse_game_market(
+        event: dict, game_pk: int, home_label: str, away_label: str
+    ) -> Optional[Market]:
+        """Build a `Market` from a Gamma event IF its two outcomes match the
+        expected home/away teams (by canonical team identity, not array
+        order — Polymarket outcome ordering is not a home/away contract).
+
+        Returns None when the event shape is unexpected or the outcomes
+        don't unambiguously map onto this game's teams, so the caller can
+        simply try the next event.
+        """
         try:
             market = event["markets"][0]
             token_ids = json.loads(market["clobTokenIds"])
@@ -67,17 +75,21 @@ class GammaClient:
             return None
         if len(token_ids) != 2 or len(outcomes) != 2:
             return None
-        # Gamma orders tokens to match `outcomes`; map outcome names to
-        # home/away via the caller's team-name matching. Placeholder maps
-        # outcome[0] -> away (Polymarket convention "Team A vs Team B" varies:
-        # TODO(M1) verify per-market and match on names, not order).
+
+        home_abbr, away_abbr = teams.match_team(home_label), teams.match_team(away_label)
+        matched = [teams.match_team(o) for o in outcomes]
+        if home_abbr is None or away_abbr is None or None in matched:
+            return None
+        if set(matched) != {home_abbr, away_abbr}:
+            return None
+        home_idx = matched.index(home_abbr)
         return Market(
             condition_id=market.get("conditionId", ""),
             game_pk=game_pk,
-            home_token_id=token_ids[1],
-            away_token_id=token_ids[0],
-            home_team=outcomes[1],
-            away_team=outcomes[0],
+            home_token_id=token_ids[home_idx],
+            away_token_id=token_ids[1 - home_idx],
+            home_team=outcomes[home_idx],
+            away_team=outcomes[1 - home_idx],
         )
 
 
@@ -97,10 +109,15 @@ class ClobMarketData:
     def get_book_top(self, token_id: str) -> BookTop:
         resp = self.http.get(f"{CLOB_BASE}/book", params={"token_id": token_id})
         resp.raise_for_status()
-        data: dict[str, Any] = resp.json()
+        return self.parse_book(token_id, resp.json(), now=time.time())
+
+    @staticmethod
+    def parse_book(token_id: str, data: dict[str, Any], now: float) -> BookTop:
+        """Pure parser for a CLOB /book payload. Prices/sizes arrive as
+        strings; level ordering is not relied upon (best bid = max price,
+        best ask = min price)."""
         bids = data.get("bids") or []
         asks = data.get("asks") or []
-        # CLOB returns price levels as strings, best level LAST in each list.
         best_bid = max(bids, key=lambda l: float(l["price"]), default=None)
         best_ask = min(asks, key=lambda l: float(l["price"]), default=None)
         return BookTop(
@@ -109,5 +126,5 @@ class ClobMarketData:
             bid_size=float(best_bid["size"]) if best_bid else 0.0,
             ask=float(best_ask["price"]) if best_ask else None,
             ask_size=float(best_ask["size"]) if best_ask else 0.0,
-            fetched_at=time.time(),
+            fetched_at=now,
         )
