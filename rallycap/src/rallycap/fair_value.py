@@ -20,8 +20,9 @@ from .wp_model import win_probability_for
 @dataclass
 class TeamRatings:
     """Pregame strength priors in runs above league average per 9 offensive
-    innings. v0: default zeros (league average). M1: feed from a maintained
-    Elo/projection source before each slate."""
+    innings. Defaults to zeros (league average); in practice supplied by
+    ratings.py (implied from the pregame market price) or, at M1+, an
+    external Elo/projection source."""
 
     home_rating_runs: float = 0.0
     away_rating_runs: float = 0.0

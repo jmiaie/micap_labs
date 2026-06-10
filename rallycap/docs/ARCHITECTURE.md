@@ -44,6 +44,8 @@ rallycap/
 │   ├── wp_model.py             In-game win probability (Lindsey-style normal
 │   │                           approx + RE24 base-out adjustment + ratings)
 │   ├── fair_value.py           Model/sharp blend, staleness & freeze logic
+│   ├── ratings.py              pregame team priors implied from the pregame
+│   │                           market price (consensus-anchored model)
 │   ├── signals.py              Entry/exit decision functions (pure, testable)
 │   ├── kelly.py                Kelly math + numeric multi-outcome optimizer
 │   ├── risk.py                 Portfolio caps, daily kill switch, sizing approval

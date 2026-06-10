@@ -17,7 +17,8 @@ from typing import Dict, List, Optional
 
 from .config import BotConfig
 from .execution.broker import Broker, PaperBroker, PolymarketBroker
-from .fair_value import compute_fair_value
+from .fair_value import TeamRatings, compute_fair_value
+from .ratings import ratings_from_pregame_prob
 from .feeds import teams
 from .feeds.mlb_statsapi import MlbStatsFeed
 from .feeds.polymarket import ClobMarketData, GammaClient
@@ -32,6 +33,7 @@ log = logging.getLogger(__name__)
 @dataclass
 class TrackedGame:
     market: Market
+    ratings: TeamRatings = field(default_factory=TeamRatings)
     state: Optional[GameState] = None
     done: bool = False
 
@@ -93,10 +95,33 @@ class Bot:
                     event, game["game_pk"], game["home_name"], game["away_name"]
                 )
                 if market is not None:
-                    self.tracked[game["game_pk"]] = TrackedGame(market=market)
+                    ratings = self._pregame_ratings(market, game.get("status", ""))
+                    self.tracked[game["game_pk"]] = TrackedGame(market=market, ratings=ratings)
                     break
         log.info("discovery: tracking %d markets for %s", len(self.tracked), date)
         return list(self.tracked.values())
+
+    def _pregame_ratings(self, market: Market, status: str) -> TeamRatings:
+        """Anchor team-strength priors to the pregame market price (see
+        ratings.py). Only valid BEFORE first pitch: implying ratings from an
+        in-game price would erase the very in-game signal we trade. Mid-game
+        joins fall back to league-average priors."""
+        if status != "Preview":
+            log.warning("gamePk %s: joined mid-game; using league-average priors "
+                        "(in-game prices cannot anchor pregame ratings)", market.game_pk)
+            return TeamRatings()
+        try:
+            book = self.market_data.get_book_top(market.home_token_id)
+        except Exception:
+            log.exception("gamePk %s: pregame book fetch failed; league-average priors",
+                          market.game_pk)
+            return TeamRatings()
+        if book.mid is None:
+            return TeamRatings()
+        ratings = ratings_from_pregame_prob(book.mid)
+        log.info("gamePk %s: pregame %.3f -> implied gap %+.2f runs/9",
+                 market.game_pk, book.mid, ratings.home_rating_runs - ratings.away_rating_runs)
+        return ratings
 
     # ------------------------------------------------------------------ loop
     def run(self) -> None:
@@ -142,7 +167,8 @@ class Bot:
             book = self.market_data.get_book_top(token)
             sharp_home = self.sharp.live_home_prob(tg.market.game_pk)
             sharp = self._side_prob(sharp_home, side)
-            fair = compute_fair_value(state, side, self.cfg, sharp_prob=sharp, now=now)
+            fair = compute_fair_value(state, side, self.cfg, ratings=tg.ratings,
+                                      sharp_prob=sharp, now=now)
             if state.is_final:
                 self._settle(token, pos, state, now)
                 continue
@@ -166,7 +192,8 @@ class Bot:
                 continue
             book = self.market_data.get_book_top(token)
             sharp = self._side_prob(self.sharp.live_home_prob(tg.market.game_pk), side)
-            fair = compute_fair_value(state, side, self.cfg, sharp_prob=sharp, now=now)
+            fair = compute_fair_value(state, side, self.cfg, ratings=tg.ratings,
+                                      sharp_prob=sharp, now=now)
             if book.ask is None:
                 continue
             size = self.risk.approve_size(book, fair, book.ask)

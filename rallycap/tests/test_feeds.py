@@ -7,9 +7,16 @@ its schema, these tests are where the change gets encoded first.
 
 import json
 
+import pytest
+
 from rallycap.feeds.mlb_statsapi import MlbStatsFeed
 from rallycap.feeds.polymarket import ClobMarketData, GammaClient
-from rallycap.feeds.sharp_odds import american_to_implied, devig_american, devig_two_way
+from rallycap.feeds.sharp_odds import (
+    american_to_implied,
+    devig_american,
+    devig_power,
+    devig_two_way,
+)
 from rallycap.types import Half
 
 # --------------------------------------------------------------- MLB statsapi
@@ -180,7 +187,29 @@ def test_devig_two_way_normalizes():
 
 
 def test_devig_american_round_trip():
-    # -300 / +240 live line: de-vigged probs sum to 1, favorite ~73-75%.
+    # -300 / +240 live line: de-vigged probs sum to 1, favorite ~72-76%.
     p_home, p_away = devig_american(-300, 240)
-    assert abs(p_home + p_away - 1.0) < 1e-12
+    assert abs(p_home + p_away - 1.0) < 1e-9
     assert 0.70 < p_home < 0.78
+
+
+def test_devig_power_sums_to_one():
+    p_a, p_b = devig_power(0.75, 0.294)
+    assert abs(p_a + p_b - 1.0) < 1e-8
+
+
+def test_devig_power_corrects_longshot_bias_vs_multiplicative():
+    # Power de-vig must give the longshot LESS probability (and the favorite
+    # more) than the multiplicative method — that is its whole point here.
+    imp_fav, imp_dog = american_to_implied(-300), american_to_implied(240)
+    mult_fav, mult_dog = devig_two_way(imp_fav, imp_dog)
+    pow_fav, pow_dog = devig_power(imp_fav, imp_dog)
+    assert pow_fav > mult_fav
+    assert pow_dog < mult_dog
+
+
+def test_devig_power_identity_on_fair_book():
+    # A book with no vig (sum exactly 1) is returned unchanged.
+    p_a, p_b = devig_power(0.6, 0.4)
+    assert p_a == pytest.approx(0.6, abs=1e-6)
+    assert p_b == pytest.approx(0.4, abs=1e-6)

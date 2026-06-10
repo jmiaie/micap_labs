@@ -20,6 +20,7 @@ take-profit cap; sizes with fractional Kelly under hard risk caps.
 | [`docs/STRATEGY_ASSESSMENT.md`](docs/STRATEGY_ASSESSMENT.md) | Quantitative assessment of the raw strategy, where real edge lives, optimized entry/exit/sizing rules, validation gates |
 | [`docs/PRD.md`](docs/PRD.md) | Product requirements: strategy parameters, functional requirements F1–F10, milestones M0–M5, risks |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System design: components, data flow, position lifecycle, failure handling |
+| [`docs/OPTIMIZATION_ROADMAP.md`](docs/OPTIMIZATION_ROADMAP.md) | Prioritized further optimizations: what's done, what needs data/feeds, what's deliberately excluded |
 
 ## Quickstart (no network, no keys)
 
@@ -75,6 +76,7 @@ Secrets (live mode only) come from the environment — see `.env.example`.
 src/rallycap/
 ├── wp_model.py        in-game win probability (RE24 + normal approximation)
 ├── fair_value.py      model/sharp-book blend + freshness & freeze logic
+├── ratings.py         pregame team priors implied from the pregame market price
 ├── signals.py         entry gates & exit priority (pure functions)
 ├── kelly.py           fractional Kelly sizing, multi-outcome optimizer
 ├── risk.py            caps, kill switch, size approval

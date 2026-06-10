@@ -20,7 +20,8 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 from ..config import BotConfig
 from ..execution.broker import PaperBroker
-from ..fair_value import compute_fair_value
+from ..fair_value import TeamRatings, compute_fair_value
+from ..ratings import ratings_from_pregame_prob
 from ..risk import PortfolioRisk
 from ..signals import evaluate_entry, evaluate_exit
 from ..types import (
@@ -261,13 +262,24 @@ class BacktestEngine:
         return tick.book_home if side is Side.HOME else tick.book_away
 
     def _run_game(self, market: Market, ticks: Iterator[Tick]) -> None:
+        ratings: Optional[TeamRatings] = None
         for tick in ticks:
             now = tick.state.fetched_at
-            self._handle_exits(market, tick, now)
+            if ratings is None:
+                # Anchor priors to the first market quote, the same way the
+                # live bot does at discovery — but only if the game is still
+                # effectively pregame; an in-game price must never be read as
+                # team quality (same guard as Bot._pregame_ratings).
+                s, mid = tick.state, tick.book_home.mid
+                pregame_ish = (s.inning == 1 and s.half is Half.TOP
+                               and s.home_score == 0 and s.away_score == 0)
+                ratings = (ratings_from_pregame_prob(mid)
+                           if pregame_ish and mid is not None else TeamRatings())
+            self._handle_exits(market, tick, now, ratings)
             if tick.state.is_final:
                 self._settle(market, tick.state)
             else:
-                self._handle_entries(market, tick, now)
+                self._handle_entries(market, tick, now, ratings)
             self._mark_equity(tick)
 
     def _open_position_on(self, market: Market) -> Optional[Tuple[str, Position]]:
@@ -278,13 +290,14 @@ class BacktestEngine:
                 return token, pos
         return None
 
-    def _handle_exits(self, market: Market, tick: Tick, now: float) -> None:
+    def _handle_exits(self, market: Market, tick: Tick, now: float,
+                      ratings: TeamRatings) -> None:
         found = self._open_position_on(market)
         if found is None:
             return
         token, pos = found
         book = self._book_for(tick, pos.side)
-        fair = compute_fair_value(tick.state, pos.side, self.cfg, now=now)
+        fair = compute_fair_value(tick.state, pos.side, self.cfg, ratings=ratings, now=now)
         sig = evaluate_exit(pos, tick.state, book, fair, self.cfg)
         if sig is None:
             return
@@ -293,14 +306,15 @@ class BacktestEngine:
             return
         self._record_close(token, pos, fill.price, fill.size_shares, sig.reason, now)
 
-    def _handle_entries(self, market: Market, tick: Tick, now: float) -> None:
+    def _handle_entries(self, market: Market, tick: Tick, now: float,
+                        ratings: TeamRatings) -> None:
         if self._open_position_on(market) is not None:
             return  # one position per game
         for side in (Side.HOME, Side.AWAY):
             book = self._book_for(tick, side)
             if book.ask is None:
                 continue
-            fair = compute_fair_value(tick.state, side, self.cfg, now=now)
+            fair = compute_fair_value(tick.state, side, self.cfg, ratings=ratings, now=now)
             size = self.risk.approve_size(book, fair, book.ask)
             sig = evaluate_entry(market, tick.state, book, fair, side, size, self.cfg, now)
             if sig is None:

@@ -61,8 +61,12 @@ account, on a small bankroll (capacity analysis: low thousands USDC max).
 `fair = w_model · WP_model + w_sharp · WP_sharp` (weights renormalize when the
 sharp feed is absent). `WP_model` is the in-game win-probability model (score
 diff, inning/half/outs, base state via RE24, pregame ratings, home field).
-`WP_sharp` is the de-vigged live moneyline from a sharp odds source (optional
-adapter; v1 ships the interface plus a null implementation).
+Pregame ratings are implied from the pregame market price at discovery
+(`ratings.py`), anchoring the model to consensus so in-game edge measures
+game-state disagreement only; mid-game joins fall back to league-average
+priors. `WP_sharp` is the de-vigged (power method) live moneyline from a
+sharp odds source (optional adapter; v1 ships the interface plus a null
+implementation).
 
 ### 5.3 Entry rules (ALL must hold)
 
