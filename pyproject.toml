@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "btc-edge"
+version = "0.1.0"
+description = "Short-horizon (5m/15m) BTC direction forecasting and prediction-market edge engine (Polymarket / Kalshi)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "pyarrow>=14",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+live = ["websockets>=12"]
+kronos = ["torch>=2.0", "huggingface_hub>=0.20", "einops", "matplotlib"]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+include = ["btc_edge*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

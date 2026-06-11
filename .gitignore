@@ -1,0 +1,26 @@
+# data & artifacts (root data dir only — btc_edge/data is source code)
+/data/
+artifacts/
+*.parquet
+*.duckdb
+*.sqlite
+ledger/
+
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# model weights
+checkpoints/
+*.pt
+*.safetensors
+
+# misc
+.DS_Store
+.ipynb_checkpoints/
