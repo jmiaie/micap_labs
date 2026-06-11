@@ -277,6 +277,7 @@ class BacktestEngine:
                            if pregame_ish and mid is not None else TeamRatings())
             self._handle_exits(market, tick, now, ratings)
             if tick.state.is_final:
+                self._cancel_market_orders(market)
                 self._settle(market, tick.state)
             else:
                 self._handle_entries(market, tick, now, ratings)
@@ -306,31 +307,71 @@ class BacktestEngine:
             return
         self._record_close(token, pos, fill.price, fill.size_shares, sig.reason, now)
 
+    def _cancel_market_orders(self, market: Market) -> None:
+        for side in (Side.HOME, Side.AWAY):
+            self.broker.cancel_all(market.token_for(side))
+
+    def _manage_resting(self, market: Market, tick: Tick, now: float,
+                        ratings: TeamRatings) -> bool:
+        """Resting-order lifecycle (cancel-on-event, then matching). Returns
+        True if an order is still resting or just filled — either way no new
+        entry may be placed on this market this tick."""
+        engaged = False
+        for side in (Side.HOME, Side.AWAY):
+            token = market.token_for(side)
+            order = self.broker.resting_order(token)
+            if order is None:
+                continue
+            book = self._book_for(tick, side)
+            fair = compute_fair_value(tick.state, side, self.cfg, ratings=ratings, now=now)
+            # Cancel-on-event: freeze/staleness, thesis gone, window closed,
+            # or the kill switch — a resting quote must never outlive the
+            # conditions that justified it.
+            stale_edge = fair.prob - order.limit_price < self.cfg.entry_edge
+            if (self.risk.killed or not fair.fresh or stale_edge
+                    or tick.state.inning > self.cfg.max_entry_inning):
+                self.broker.cancel_all(token)
+                continue
+            fill = self.broker.try_fill_resting(token, book, now)
+            if fill is not None:
+                pos = Position(
+                    market=market, side=side,
+                    entry_price=fill.price, size_shares=fill.size_shares,
+                    entry_edge=fair.prob - fill.price, opened_at=now,
+                )
+                self.risk.register_open(token, pos)
+            engaged = True
+        return engaged
+
     def _handle_entries(self, market: Market, tick: Tick, now: float,
                         ratings: TeamRatings) -> None:
         if self._open_position_on(market) is not None:
-            return  # one position per game
+            self._cancel_market_orders(market)  # position first: no stacked quotes
+            return
+        if self._manage_resting(market, tick, now, ratings):
+            return
         for side in (Side.HOME, Side.AWAY):
             book = self._book_for(tick, side)
             if book.ask is None:
                 continue
             fair = compute_fair_value(tick.state, side, self.cfg, ratings=ratings, now=now)
-            size = self.risk.approve_size(book, fair, book.ask)
+            size = self.risk.approve_size(book, fair, book.ask,
+                                          self.broker.resting_count(),
+                                          self.broker.resting_cost())
             sig = evaluate_entry(market, tick.state, book, fair, side, size, self.cfg, now)
             if sig is None:
                 continue
-            fill = self.broker.buy(
-                market.token_for(side), side, sig.limit_price, sig.size_shares, book, sig.cross
-            )
-            if fill is None:
-                continue
-            pos = Position(
-                market=market, side=side,
-                entry_price=fill.price, size_shares=fill.size_shares,
-                entry_edge=sig.fair - fill.price, opened_at=now,
-            )
-            self.risk.register_open(market.token_for(side), pos)
-            return  # at most one entry per market per tick
+            token = market.token_for(side)
+            fill = self.broker.buy(token, side, sig.limit_price, sig.size_shares, book, sig.cross)
+            if fill is not None:
+                pos = Position(
+                    market=market, side=side,
+                    entry_price=fill.price, size_shares=fill.size_shares,
+                    entry_edge=sig.fair - fill.price, opened_at=now,
+                )
+                self.risk.register_open(token, pos)
+            if fill is not None or self.broker.resting_order(token) is not None:
+                return  # filled or rested: one engagement per market per tick
 
     def _settle(self, market: Market, final: GameState) -> None:
         found = self._open_position_on(market)

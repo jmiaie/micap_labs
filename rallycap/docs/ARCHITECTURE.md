@@ -56,9 +56,12 @@ rallycap/
 │   │   ├── mlb_statsapi.py     statsapi.mlb.com schedule + live feed parser
 │   │   └── sharp_odds.py       SharpOddsSource protocol, de-vig math, Null impl
 │   ├── execution/
-│   │   └── broker.py           Broker protocol; PaperBroker; PolymarketBroker stub
+│   │   └── broker.py           Broker protocol; PaperBroker (crossing fills +
+│   │                           resting passive buys w/ trade-through fills and
+│   │                           cancel-on-event); PolymarketBroker stub
 │   ├── backtest/
-│   │   └── engine.py           Event-driven backtester + synthetic game/market sim
+│   │   ├── engine.py           Event-driven backtester + synthetic game/market sim
+│   │   └── calibrate.py        WP-constant fitting from line scores + Brier gate
 │   ├── bot.py                  Orchestrator loop, state persistence, modes
 │   └── cli.py                  argparse CLI: discover / backtest / paper / live
 └── tests/                      Unit tests for math + signals + backtest plumbing

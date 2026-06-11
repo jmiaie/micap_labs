@@ -1,6 +1,7 @@
 """CLI entry point.
 
   rallycap backtest --games 200 --seed 7     # offline synthetic run (no network)
+  rallycap calibrate --line-scores g.jsonl   # fit WP model constants from data
   rallycap discover                          # list today's matched markets
   rallycap paper                             # live feeds, simulated fills
   rallycap live --i-understand-live-risk     # real orders (gated until M4)
@@ -37,6 +38,11 @@ def main(argv: list[str] | None = None) -> int:
     bt.add_argument("--overreaction", type=float, default=SimParams.overreaction,
                     help="simulated post-event market overshoot (prob units)")
 
+    cal = sub.add_parser("calibrate", help="fit WP model constants from line scores")
+    cal.add_argument("--line-scores", required=True,
+                     help="JSONL of {\"home\": [runs/inning], \"away\": [...]} per game "
+                          "(see backtest/calibrate.py for schema and sources)")
+
     sub.add_parser("discover", help="match today's MLB games to Polymarket markets")
     sub.add_parser("paper", help="run with live feeds and simulated fills")
 
@@ -55,6 +61,13 @@ def main(argv: list[str] | None = None) -> int:
         print(result.summary())
         print("\nNOTE: synthetic games contain injected overreaction by construction —")
         print("this validates the pipeline, not the edge (docs/STRATEGY_ASSESSMENT.md §7).")
+        return 0
+
+    if args.command == "calibrate":
+        from .backtest.calibrate import calibrate, load_line_scores_jsonl
+
+        report = calibrate(load_line_scores_jsonl(args.line_scores))
+        print(report.summary())
         return 0
 
     if args.command == "discover":

@@ -180,23 +180,30 @@ class Bot:
                 self._close(token, pos, fill.price, fill.size_shares, sig.reason, now)
 
         if state.is_final:
+            self._cancel_market_orders(tg.market)
             tg.done = True
             return
         if self.risk.killed:
+            self._cancel_market_orders(tg.market)
             return
 
-        # Entries.
+        # Entries: position check, then resting-order lifecycle, then new orders.
+        if any(tg.market.token_for(s) in self.risk.open_positions for s in Side):
+            self._cancel_market_orders(tg.market)  # no quotes alongside a position
+            return
+        if self._manage_resting(tg, state, now):
+            return
         for side in (Side.HOME, Side.AWAY):
             token = tg.market.token_for(side)
-            if token in self.risk.open_positions or tg.market.token_for(side.opponent) in self.risk.open_positions:
-                continue
             book = self.market_data.get_book_top(token)
             sharp = self._side_prob(self.sharp.live_home_prob(tg.market.game_pk), side)
             fair = compute_fair_value(state, side, self.cfg, ratings=tg.ratings,
                                       sharp_prob=sharp, now=now)
             if book.ask is None:
                 continue
-            size = self.risk.approve_size(book, fair, book.ask)
+            size = self.risk.approve_size(book, fair, book.ask,
+                                          self.broker.resting_count(),
+                                          self.broker.resting_cost())
             sig = evaluate_entry(tg.market, state, book, fair, side, size, self.cfg, now)
             if sig is None:
                 continue
@@ -212,6 +219,53 @@ class Bot:
                          tg.market.game_pk, side.value, fill.price, fill.size_shares,
                          sig.fair, pos.entry_edge)
                 break  # one position per game
+            if self.broker.resting_order(token) is not None:
+                log.info("REST %s %s bid %.2f x %.1f (fair %.3f)",
+                         tg.market.game_pk, side.value, sig.limit_price,
+                         sig.size_shares, sig.fair)
+                break  # one resting order per game
+
+    def _cancel_market_orders(self, market: Market) -> None:
+        for side in Side:
+            token = market.token_for(side)
+            if self.broker.resting_order(token) is not None:
+                self.broker.cancel_all(token)
+
+    def _manage_resting(self, tg: TrackedGame, state: GameState, now: float) -> bool:
+        """Resting-order lifecycle, mirroring the backtest engine: cancel on
+        freeze/staleness, lost edge, closed entry window, or kill switch;
+        otherwise try to fill. Returns True while engaged on this market."""
+        engaged = False
+        for side in Side:
+            token = tg.market.token_for(side)
+            order = self.broker.resting_order(token)
+            if order is None:
+                continue
+            book = self.market_data.get_book_top(token)
+            sharp = self._side_prob(self.sharp.live_home_prob(tg.market.game_pk), side)
+            fair = compute_fair_value(state, side, self.cfg, ratings=tg.ratings,
+                                      sharp_prob=sharp, now=now)
+            stale_edge = fair.prob - order.limit_price < self.cfg.entry_edge
+            if (self.risk.killed or not fair.fresh or stale_edge
+                    or state.inning > self.cfg.max_entry_inning):
+                self.broker.cancel_all(token)
+                log.info("CANCEL %s %s resting bid %.2f (fresh=%s edge_ok=%s)",
+                         tg.market.game_pk, side.value, order.limit_price,
+                         fair.fresh, not stale_edge)
+                continue
+            fill = self.broker.try_fill_resting(token, book, now)
+            if fill is not None:
+                pos = Position(
+                    market=tg.market, side=side, entry_price=fill.price,
+                    size_shares=fill.size_shares, entry_edge=fair.prob - fill.price,
+                    opened_at=now,
+                )
+                self.risk.register_open(token, pos)
+                log.info("FILL (passive) %s %s %.2f x %.1f (fair %.3f)",
+                         tg.market.game_pk, side.value, fill.price,
+                         fill.size_shares, fair.prob)
+            engaged = True
+        return engaged
 
     # -------------------------------------------------------------- helpers
     @staticmethod

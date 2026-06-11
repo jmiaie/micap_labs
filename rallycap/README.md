@@ -41,6 +41,7 @@ tune parameters against it.
 
 ```bash
 rallycap discover                       # match today's MLB games to Polymarket markets
+rallycap calibrate --line-scores g.jsonl  # fit WP model constants from historical data
 rallycap paper                          # live feeds, simulated fills (the default mode)
 rallycap live --i-understand-live-risk  # real orders — gated until milestone M4
 ```

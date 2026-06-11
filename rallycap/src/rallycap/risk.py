@@ -47,15 +47,20 @@ class PortfolioRisk:
         self.killed = False
 
     # ----------------------------------------------------------------- sizing
-    def approve_size(self, book: BookTop, fair: FairValue, entry_price: float) -> float:
+    def approve_size(self, book: BookTop, fair: FairValue, entry_price: float,
+                     pending_count: int = 0, pending_cost: float = 0.0) -> float:
         """Risk-approved size in SHARES for a prospective entry, or 0.0.
 
         Applies, in order: kill switch, concurrency cap, fractional Kelly,
         per-trade bankroll cap, total at-risk cap, and depth participation.
+
+        `pending_count`/`pending_cost` are the broker's resting orders —
+        commitments that may become positions without another risk check, so
+        they count against the concurrency and at-risk caps now.
         """
         if self.killed:
             return 0.0
-        if len(self.open_positions) >= self.cfg.max_concurrent_positions:
+        if len(self.open_positions) + pending_count >= self.cfg.max_concurrent_positions:
             return 0.0
         if entry_price <= 0.0 or book.ask is None:
             return 0.0
@@ -72,7 +77,8 @@ class PortfolioRisk:
             return 0.0
 
         stake = min(f, self.cfg.max_trade_pct) * self.bankroll
-        headroom = self.cfg.max_total_at_risk_pct * self.bankroll - self.total_at_risk
+        headroom = (self.cfg.max_total_at_risk_pct * self.bankroll
+                    - self.total_at_risk - pending_cost)
         stake = min(stake, max(0.0, headroom))
         # Don't be the whole top of book: fills beyond it are fictional anyway.
         depth_cap_shares = book.ask_size * self.cfg.max_depth_participation

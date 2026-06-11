@@ -1,8 +1,10 @@
+import random
+
+import pytest
+
 from rallycap.backtest.engine import BacktestEngine, SimParams, SyntheticGame
 from rallycap.config import BotConfig
 from rallycap.types import Half
-
-import random
 
 
 def test_synthetic_game_produces_coherent_ticks():
@@ -44,3 +46,29 @@ def test_backtest_respects_kill_switch_state():
     # With an absurdly tight daily loss limit, the kill switch must engage on
     # any losing game-day rather than letting losses run.
     assert engine.risk.killed or result.total_pnl >= 0
+
+
+def test_cash_reconciles_with_bankroll_after_run():
+    # All positions settle and all resting orders cancel by game end, so the
+    # broker's cash must equal the risk module's bankroll exactly.
+    cfg = BotConfig(bankroll_usd=1000.0)
+    engine = BacktestEngine(cfg)
+    engine.run_synthetic(n_games=60, seed=21)
+    assert engine.broker.resting_count() == 0
+    assert engine.risk.open_positions == {}
+    assert engine.broker.cash == pytest.approx(engine.risk.bankroll)
+
+
+def test_passive_only_mode_trades_via_resting_fills():
+    # Forbid crossing entirely (huge cross_margin): every entry must rest and
+    # can only fill on strict trade-through. The pipeline should still trade,
+    # and every recorded entry must be at our passive prices (never the ask
+    # at signal time — i.e. cheaper entries than the crossing path).
+    cfg = BotConfig(bankroll_usd=1000.0, cross_margin=10.0)
+    engine = BacktestEngine(cfg)
+    result = engine.run_synthetic(n_games=150, seed=9)
+    assert result.n_trades > 0
+    assert engine.broker.resting_count() == 0          # nothing left dangling
+    assert engine.broker.cash == pytest.approx(engine.risk.bankroll)
+    for t in result.trades:
+        assert t.entry_edge > 0
