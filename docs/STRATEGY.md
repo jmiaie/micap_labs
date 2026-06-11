@@ -53,15 +53,20 @@ traders price "can it move $300 in 90 seconds?" off intuition; the empirical
 distribution knows. Cheap, durable, already implemented.
 
 ### E3 — ML direction tilt at window open (real, thin, venue-dependent)
-Stacked logistic+HGB on 31 causal features: OOS 51.45% @5m / 51.36% @15m;
-52.3–52.9% on the p≥0.55 confident subset. Simulated vs ~50/50 quotes with 1¢
-half-spread: **+1.1 to +1.9¢ per $1** on Polymarket (fee-free), **negative to
-breakeven on Kalshi** after its taker fee. Verdict: tradeable only on fee-free
-venues, as a tilt on E1/E2 rather than standalone. Upside not yet captured:
-the backtest source (Bitstamp) lacks taker-buy flow — Binance-trained flow
-features (`flow_imb_*`, `cvd_slope`) are wired in and historically the
-strongest microstructure family. Retrain on Binance data before judging E3's
-ceiling.
+Stacked logistic+HGB on 37 causal features: OOS 51.2% @5m / 51.4% @15m
+(p ≤ 1.6e-14 vs coin); **53.7% @5m / 52.6% @15m on the p≥0.55 confident
+subset**. Simulated vs ~50/50 quotes with 1¢ half-spread: **+1.1 to +2.7¢ per
+$1** on Polymarket (fee-free); on Kalshi the taker fee keeps low-threshold
+trading negative but the p≥0.55 gate flips marginally positive (+0.9¢ @5m).
+Verdict: tradeable only with a confidence gate, as a tilt on E1/E2 rather than
+standalone. A/B note: adding QuantAgent's oscillator family (31→37 features)
+left topline accuracy within noise in both directions but improved the
+actionable confident tail at 5m (52.3%→53.7% @ p≥0.55, baseline preserved in
+`results/backtest_2025-06_2026-06_31feat_baseline.json`) — kept, since it
+costs no dependencies. Upside not yet captured: the backtest source (Bitstamp)
+lacks taker-buy flow — Binance-trained flow features (`flow_imb_*`,
+`cvd_slope`) are wired in and historically the strongest microstructure
+family. Retrain on Binance data before judging E3's ceiling.
 
 ### E4 — Kronos foundation model (implemented, unvalidated — next experiment)
 [Kronos](https://github.com/shiyu-coder/Kronos) (24.7M-param K-line foundation

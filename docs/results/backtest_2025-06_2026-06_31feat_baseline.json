@@ -12,7 +12,7 @@
     "train_days": 45,
     "test_days": 7,
     "calib_days": 5,
-    "out": "data/artifacts/run_qa_feats"
+    "out": "data/artifacts/run_2025H2_2026"
   },
   "gap_report": {
     "rows": 1594081,
@@ -29,186 +29,179 @@
         "all": {
           "n": 539995,
           "base_rate": 0.5057,
-          "accuracy": 0.5122,
-          "acc_binom_pvalue_vs_0.5": 6.05e-72,
-          "brier": 0.24988,
+          "accuracy": 0.5135,
+          "acc_binom_pvalue_vs_0.5": 4.65e-88,
+          "brier": 0.2499,
           "brier_const_0.5": 0.25,
-          "log_loss": 0.69291,
+          "log_loss": 0.69294,
           "log_loss_const": 0.69308,
-          "auc": 0.5161
+          "auc": 0.5166
         },
         "nonoverlap": {
           "n": 107999,
           "base_rate": 0.5064,
-          "accuracy": 0.5116,
-          "acc_binom_pvalue_vs_0.5": 1.61e-14,
-          "brier": 0.24996,
+          "accuracy": 0.5145,
+          "acc_binom_pvalue_vs_0.5": 8.75e-22,
+          "brier": 0.24992,
           "brier_const_0.5": 0.25,
-          "log_loss": 0.69308,
+          "log_loss": 0.693,
           "log_loss_const": 0.69307,
-          "auc": 0.5147
+          "auc": 0.5168
         }
       },
       "confident": [
         {
           "threshold": 0.52,
-          "n": 39638,
-          "share_of_time": 0.367,
-          "accuracy": 0.5215,
-          "binom_pvalue_vs_0.5": 6.42e-18,
+          "n": 41618,
+          "share_of_time": 0.3854,
+          "accuracy": 0.5212,
+          "binom_pvalue_vs_0.5": 2.98e-18,
           "avg_conf": 0.5374
         },
         {
           "threshold": 0.55,
-          "n": 7048,
-          "share_of_time": 0.0653,
-          "accuracy": 0.5369,
-          "binom_pvalue_vs_0.5": 3.11e-10,
-          "avg_conf": 0.5673
+          "n": 7633,
+          "share_of_time": 0.0707,
+          "accuracy": 0.5231,
+          "binom_pvalue_vs_0.5": 2.79e-05,
+          "avg_conf": 0.5674
         },
         {
           "threshold": 0.58,
-          "n": 1235,
-          "share_of_time": 0.0114,
-          "accuracy": 0.5223,
-          "binom_pvalue_vs_0.5": 0.0622,
-          "avg_conf": 0.5985
+          "n": 1307,
+          "share_of_time": 0.0121,
+          "accuracy": 0.5226,
+          "binom_pvalue_vs_0.5": 0.0543,
+          "avg_conf": 0.5992
         },
         {
           "threshold": 0.62,
-          "n": 158,
-          "share_of_time": 0.0015,
-          "accuracy": 0.5063,
-          "binom_pvalue_vs_0.5": 0.468,
-          "avg_conf": 0.639
+          "n": 173,
+          "share_of_time": 0.0016,
+          "accuracy": 0.5549,
+          "binom_pvalue_vs_0.5": 0.0855,
+          "avg_conf": 0.6394
         }
       ],
       "calibration": [
         {
           "bin": "(0.2, 0.3]",
-          "n": "5",
-          "p_mean": "0.281",
-          "y_rate": "0.6",
-          "gap": "-0.319"
+          "n": "3",
+          "p_mean": "0.2955",
+          "y_rate": "1.0",
+          "gap": "-0.7045"
         },
         {
           "bin": "(0.3, 0.4]",
-          "n": "1126",
-          "p_mean": "0.3829",
-          "y_rate": "0.4476",
-          "gap": "-0.0647"
+          "n": "1191",
+          "p_mean": "0.3815",
+          "y_rate": "0.4416",
+          "gap": "-0.0602"
         },
         {
           "bin": "(0.4, 0.5]",
-          "n": "340105",
-          "p_mean": "0.48",
-          "y_rate": "0.486",
-          "gap": "-0.0059"
+          "n": "341540",
+          "p_mean": "0.4797",
+          "y_rate": "0.485",
+          "gap": "-0.0052"
         },
         {
           "bin": "(0.5, 0.6]",
-          "n": "197953",
-          "p_mean": "0.5172",
-          "y_rate": "0.5085",
-          "gap": "0.0087"
+          "n": "196217",
+          "p_mean": "0.518",
+          "y_rate": "0.5103",
+          "gap": "0.0077"
         },
         {
           "bin": "(0.6, 0.7]",
-          "n": "797",
+          "n": "1041",
           "p_mean": "0.6203",
-          "y_rate": "0.5747",
-          "gap": "0.0457"
+          "y_rate": "0.5773",
+          "gap": "0.0429"
         },
         {
           "bin": "(0.7, 0.8]",
-          "n": "8",
-          "p_mean": "0.7196",
+          "n": "3",
+          "p_mean": "0.7556",
           "y_rate": "1.0",
-          "gap": "-0.2804"
-        },
-        {
-          "bin": "(0.8, 0.9]",
-          "n": "1",
-          "p_mean": "0.8032",
-          "y_rate": "1.0",
-          "gap": "-0.1968"
+          "gap": "-0.2444"
         }
       ],
       "trade_sim": {
         "polymarket_minedge_0.02": {
-          "trades": 39638,
-          "share_of_windows": 0.367,
-          "hit_rate": 0.5215,
+          "trades": 41618,
+          "share_of_windows": 0.3854,
+          "hit_rate": 0.5212,
           "avg_edge_claimed": 0.0374,
-          "avg_pnl_per_$1_contract": 0.01147,
-          "total_pnl_per_$1_flat": 454.62,
-          "final_bankroll_frac_kelly": 9811.8186,
-          "max_drawdown": 0.8077,
+          "avg_pnl_per_$1_contract": 0.01117,
+          "total_pnl_per_$1_flat": 464.82,
+          "final_bankroll_frac_kelly": 13822.942,
+          "max_drawdown": 0.7592,
           "fee_model": "polymarket",
           "assumed_quote": 0.5,
           "min_edge": 0.02
         },
         "polymarket_minedge_0.03": {
-          "trades": 22384,
-          "share_of_windows": 0.2073,
-          "hit_rate": 0.5226,
-          "avg_edge_claimed": 0.0474,
-          "avg_pnl_per_$1_contract": 0.01261,
-          "total_pnl_per_$1_flat": 282.16,
-          "final_bankroll_frac_kelly": 1218.5912,
-          "max_drawdown": 0.7313,
+          "trades": 23208,
+          "share_of_windows": 0.2149,
+          "hit_rate": 0.5246,
+          "avg_edge_claimed": 0.0478,
+          "avg_pnl_per_$1_contract": 0.0146,
+          "total_pnl_per_$1_flat": 338.92,
+          "final_bankroll_frac_kelly": 2377.6099,
+          "max_drawdown": 0.7575,
           "fee_model": "polymarket",
           "assumed_quote": 0.5,
           "min_edge": 0.03
         },
         "polymarket_minedge_0.05": {
-          "trades": 7048,
-          "share_of_windows": 0.0653,
-          "hit_rate": 0.5369,
-          "avg_edge_claimed": 0.0673,
-          "avg_pnl_per_$1_contract": 0.02689,
-          "total_pnl_per_$1_flat": 189.52,
-          "final_bankroll_frac_kelly": 480.4752,
-          "max_drawdown": 0.5259,
+          "trades": 7633,
+          "share_of_windows": 0.0707,
+          "hit_rate": 0.5231,
+          "avg_edge_claimed": 0.0674,
+          "avg_pnl_per_$1_contract": 0.01312,
+          "total_pnl_per_$1_flat": 100.17,
+          "final_bankroll_frac_kelly": 11.9631,
+          "max_drawdown": 0.7274,
           "fee_model": "polymarket",
           "assumed_quote": 0.5,
           "min_edge": 0.05
         },
         "kalshi_minedge_0.02": {
-          "trades": 39638,
-          "share_of_windows": 0.367,
-          "hit_rate": 0.5215,
+          "trades": 41618,
+          "share_of_windows": 0.3854,
+          "hit_rate": 0.5212,
           "avg_edge_claimed": 0.0374,
-          "avg_pnl_per_$1_contract": -0.00603,
-          "total_pnl_per_$1_flat": -239.04,
-          "final_bankroll_frac_kelly": 0.3509,
-          "max_drawdown": 0.8535,
+          "avg_pnl_per_$1_contract": -0.00633,
+          "total_pnl_per_$1_flat": -263.49,
+          "final_bankroll_frac_kelly": 0.1152,
+          "max_drawdown": 0.9632,
           "fee_model": "kalshi",
           "assumed_quote": 0.5,
           "min_edge": 0.02
         },
         "kalshi_minedge_0.03": {
-          "trades": 22384,
-          "share_of_windows": 0.2073,
-          "hit_rate": 0.5226,
-          "avg_edge_claimed": 0.0474,
-          "avg_pnl_per_$1_contract": -0.00489,
-          "total_pnl_per_$1_flat": -109.56,
-          "final_bankroll_frac_kelly": 0.3664,
-          "max_drawdown": 0.85,
+          "trades": 23208,
+          "share_of_windows": 0.2149,
+          "hit_rate": 0.5246,
+          "avg_edge_claimed": 0.0478,
+          "avg_pnl_per_$1_contract": -0.0029,
+          "total_pnl_per_$1_flat": -67.22,
+          "final_bankroll_frac_kelly": 0.1103,
+          "max_drawdown": 0.9646,
           "fee_model": "kalshi",
           "assumed_quote": 0.5,
           "min_edge": 0.03
         },
         "kalshi_minedge_0.05": {
-          "trades": 7048,
-          "share_of_windows": 0.0653,
-          "hit_rate": 0.5369,
-          "avg_edge_claimed": 0.0673,
-          "avg_pnl_per_$1_contract": 0.00939,
-          "total_pnl_per_$1_flat": 66.18,
-          "final_bankroll_frac_kelly": 3.9942,
-          "max_drawdown": 0.6326,
+          "trades": 7633,
+          "share_of_windows": 0.0707,
+          "hit_rate": 0.5231,
+          "avg_edge_claimed": 0.0674,
+          "avg_pnl_per_$1_contract": -0.00438,
+          "total_pnl_per_$1_flat": -33.41,
+          "final_bankroll_frac_kelly": 0.1999,
+          "max_drawdown": 0.8933,
           "fee_model": "kalshi",
           "assumed_quote": 0.5,
           "min_edge": 0.05
@@ -219,48 +212,48 @@
           "all": {
             "n": 539995,
             "base_rate": 0.5057,
-            "accuracy": 0.5147,
-            "acc_binom_pvalue_vs_0.5": 2.27e-103,
-            "brier": 0.25005,
+            "accuracy": 0.5144,
+            "acc_binom_pvalue_vs_0.5": 1.26e-99,
+            "brier": 0.24999,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.69327,
+            "log_loss": 0.69315,
             "log_loss_const": 0.69308,
-            "auc": 0.5198
+            "auc": 0.5195
           },
           "nonoverlap": {
             "n": 107999,
             "base_rate": 0.5064,
-            "accuracy": 0.5153,
-            "acc_binom_pvalue_vs_0.5": 3.64e-24,
-            "brier": 0.25012,
+            "accuracy": 0.5159,
+            "acc_binom_pvalue_vs_0.5": 1.01e-25,
+            "brier": 0.25001,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.69343,
+            "log_loss": 0.6932,
             "log_loss_const": 0.69307,
-            "auc": 0.5194
+            "auc": 0.5201
           }
         },
         "hgb": {
           "all": {
             "n": 539995,
             "base_rate": 0.5057,
-            "accuracy": 0.51,
-            "acc_binom_pvalue_vs_0.5": 1.62e-49,
-            "brier": 0.25658,
+            "accuracy": 0.5098,
+            "acc_binom_pvalue_vs_0.5": 4.99e-47,
+            "brier": 0.2567,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.7074,
+            "log_loss": 0.70767,
             "log_loss_const": 0.69308,
-            "auc": 0.5143
+            "auc": 0.5138
           },
           "nonoverlap": {
             "n": 107999,
             "base_rate": 0.5064,
-            "accuracy": 0.5083,
-            "acc_binom_pvalue_vs_0.5": 2.39e-08,
-            "brier": 0.25659,
+            "accuracy": 0.5101,
+            "acc_binom_pvalue_vs_0.5": 1.45e-11,
+            "brier": 0.25658,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.70738,
+            "log_loss": 0.70741,
             "log_loss_const": 0.69307,
-            "auc": 0.5135
+            "auc": 0.5143
           }
         }
       },
@@ -271,193 +264,193 @@
         "all": {
           "n": 539985,
           "base_rate": 0.5035,
-          "accuracy": 0.5113,
-          "acc_binom_pvalue_vs_0.5": 4.55e-62,
-          "brier": 0.25061,
+          "accuracy": 0.5108,
+          "acc_binom_pvalue_vs_0.5": 2.12e-57,
+          "brier": 0.25063,
           "brier_const_0.5": 0.25,
-          "log_loss": 0.69441,
+          "log_loss": 0.69444,
           "log_loss_const": 0.69312,
-          "auc": 0.5141
+          "auc": 0.5131
         },
         "nonoverlap": {
           "n": 35999,
           "base_rate": 0.505,
-          "accuracy": 0.5137,
-          "acc_binom_pvalue_vs_0.5": 9.56e-08,
-          "brier": 0.25036,
+          "accuracy": 0.5136,
+          "acc_binom_pvalue_vs_0.5": 1.34e-07,
+          "brier": 0.25035,
           "brier_const_0.5": 0.25,
-          "log_loss": 0.69391,
+          "log_loss": 0.69388,
           "log_loss_const": 0.6931,
-          "auc": 0.5186
+          "auc": 0.5174
         }
       },
       "confident": [
         {
           "threshold": 0.52,
-          "n": 19464,
-          "share_of_time": 0.5407,
-          "accuracy": 0.5242,
-          "binom_pvalue_vs_0.5": 6.88e-12,
-          "avg_conf": 0.5461
+          "n": 19676,
+          "share_of_time": 0.5466,
+          "accuracy": 0.5194,
+          "binom_pvalue_vs_0.5": 2.88e-08,
+          "avg_conf": 0.5457
         },
         {
           "threshold": 0.55,
-          "n": 5896,
-          "share_of_time": 0.1638,
-          "accuracy": 0.5261,
-          "binom_pvalue_vs_0.5": 3.18e-05,
-          "avg_conf": 0.5767
+          "n": 6050,
+          "share_of_time": 0.1681,
+          "accuracy": 0.5294,
+          "binom_pvalue_vs_0.5": 2.49e-06,
+          "avg_conf": 0.5758
         },
         {
           "threshold": 0.58,
-          "n": 1842,
-          "share_of_time": 0.0512,
-          "accuracy": 0.5168,
-          "binom_pvalue_vs_0.5": 0.0776,
-          "avg_conf": 0.6091
+          "n": 1841,
+          "share_of_time": 0.0511,
+          "accuracy": 0.5269,
+          "binom_pvalue_vs_0.5": 0.0112,
+          "avg_conf": 0.6072
         },
         {
           "threshold": 0.62,
-          "n": 446,
-          "share_of_time": 0.0124,
-          "accuracy": 0.5471,
-          "binom_pvalue_vs_0.5": 0.026,
-          "avg_conf": 0.6529
+          "n": 440,
+          "share_of_time": 0.0122,
+          "accuracy": 0.55,
+          "binom_pvalue_vs_0.5": 0.0201,
+          "avg_conf": 0.6471
         }
       ],
       "calibration": [
         {
           "bin": "(0.1, 0.2]",
           "n": "1",
-          "p_mean": "0.1709",
+          "p_mean": "0.1951",
           "y_rate": "1.0",
-          "gap": "-0.8291"
+          "gap": "-0.8049"
         },
         {
           "bin": "(0.2, 0.3]",
-          "n": "53",
-          "p_mean": "0.2771",
-          "y_rate": "0.6226",
-          "gap": "-0.3456"
+          "n": "9",
+          "p_mean": "0.2782",
+          "y_rate": "0.7778",
+          "gap": "-0.4995"
         },
         {
           "bin": "(0.3, 0.4]",
-          "n": "4492",
-          "p_mean": "0.3796",
-          "y_rate": "0.4893",
-          "gap": "-0.1097"
+          "n": "3928",
+          "p_mean": "0.381",
+          "y_rate": "0.4982",
+          "gap": "-0.1172"
         },
         {
           "bin": "(0.4, 0.5]",
-          "n": "314050",
-          "p_mean": "0.4729",
-          "y_rate": "0.4874",
-          "gap": "-0.0145"
+          "n": "318298",
+          "p_mean": "0.4728",
+          "y_rate": "0.4878",
+          "gap": "-0.015"
         },
         {
           "bin": "(0.5, 0.6]",
-          "n": "212605",
+          "n": "208719",
           "p_mean": "0.5257",
-          "y_rate": "0.509",
-          "gap": "0.0167"
+          "y_rate": "0.5081",
+          "gap": "0.0176"
         },
         {
           "bin": "(0.6, 0.7]",
-          "n": "8221",
-          "p_mean": "0.6277",
-          "y_rate": "0.5184",
-          "gap": "0.1092"
+          "n": "8747",
+          "p_mean": "0.628",
+          "y_rate": "0.5278",
+          "gap": "0.1001"
         },
         {
           "bin": "(0.7, 0.8]",
-          "n": "549",
-          "p_mean": "0.73",
-          "y_rate": "0.5501",
-          "gap": "0.18"
+          "n": "280",
+          "p_mean": "0.7195",
+          "y_rate": "0.5929",
+          "gap": "0.1266"
         },
         {
           "bin": "(0.8, 0.9]",
-          "n": "14",
-          "p_mean": "0.8169",
-          "y_rate": "0.6429",
-          "gap": "0.1741"
+          "n": "3",
+          "p_mean": "0.8037",
+          "y_rate": "1.0",
+          "gap": "-0.1963"
         }
       ],
       "trade_sim": {
         "polymarket_minedge_0.02": {
-          "trades": 19464,
-          "share_of_windows": 0.5407,
-          "hit_rate": 0.5242,
-          "avg_edge_claimed": 0.0461,
-          "avg_pnl_per_$1_contract": 0.01425,
-          "total_pnl_per_$1_flat": 277.36,
-          "final_bankroll_frac_kelly": 517.8701,
-          "max_drawdown": 0.902,
+          "trades": 19676,
+          "share_of_windows": 0.5466,
+          "hit_rate": 0.5194,
+          "avg_edge_claimed": 0.0457,
+          "avg_pnl_per_$1_contract": 0.00936,
+          "total_pnl_per_$1_flat": 184.24,
+          "final_bankroll_frac_kelly": 61.8119,
+          "max_drawdown": 0.885,
           "fee_model": "polymarket",
           "assumed_quote": 0.5,
           "min_edge": 0.02
         },
         "polymarket_minedge_0.03": {
-          "trades": 13687,
-          "share_of_windows": 0.3802,
-          "hit_rate": 0.5262,
-          "avg_edge_claimed": 0.0551,
-          "avg_pnl_per_$1_contract": 0.01619,
-          "total_pnl_per_$1_flat": 221.63,
-          "final_bankroll_frac_kelly": 300.2133,
-          "max_drawdown": 0.8954,
+          "trades": 13427,
+          "share_of_windows": 0.373,
+          "hit_rate": 0.5229,
+          "avg_edge_claimed": 0.0555,
+          "avg_pnl_per_$1_contract": 0.0129,
+          "total_pnl_per_$1_flat": 173.23,
+          "final_bankroll_frac_kelly": 61.3773,
+          "max_drawdown": 0.8832,
           "fee_model": "polymarket",
           "assumed_quote": 0.5,
           "min_edge": 0.03
         },
         "polymarket_minedge_0.05": {
-          "trades": 5896,
-          "share_of_windows": 0.1638,
-          "hit_rate": 0.5261,
-          "avg_edge_claimed": 0.0767,
-          "avg_pnl_per_$1_contract": 0.01612,
-          "total_pnl_per_$1_flat": 95.04,
-          "final_bankroll_frac_kelly": 13.7913,
-          "max_drawdown": 0.8653,
+          "trades": 6050,
+          "share_of_windows": 0.1681,
+          "hit_rate": 0.5294,
+          "avg_edge_claimed": 0.0758,
+          "avg_pnl_per_$1_contract": 0.01942,
+          "total_pnl_per_$1_flat": 117.5,
+          "final_bankroll_frac_kelly": 32.855,
+          "max_drawdown": 0.7671,
           "fee_model": "polymarket",
           "assumed_quote": 0.5,
           "min_edge": 0.05
         },
         "kalshi_minedge_0.02": {
-          "trades": 19464,
-          "share_of_windows": 0.5407,
-          "hit_rate": 0.5242,
-          "avg_edge_claimed": 0.0461,
-          "avg_pnl_per_$1_contract": -0.00325,
-          "total_pnl_per_$1_flat": -63.26,
-          "final_bankroll_frac_kelly": 0.273,
-          "max_drawdown": 0.9361,
+          "trades": 19676,
+          "share_of_windows": 0.5466,
+          "hit_rate": 0.5194,
+          "avg_edge_claimed": 0.0457,
+          "avg_pnl_per_$1_contract": -0.00814,
+          "total_pnl_per_$1_flat": -160.09,
+          "final_bankroll_frac_kelly": 0.1626,
+          "max_drawdown": 0.9634,
           "fee_model": "kalshi",
           "assumed_quote": 0.5,
           "min_edge": 0.02
         },
         "kalshi_minedge_0.03": {
-          "trades": 13687,
-          "share_of_windows": 0.3802,
-          "hit_rate": 0.5262,
-          "avg_edge_claimed": 0.0551,
-          "avg_pnl_per_$1_contract": -0.00131,
-          "total_pnl_per_$1_flat": -17.89,
-          "final_bankroll_frac_kelly": 0.2788,
-          "max_drawdown": 0.936,
+          "trades": 13427,
+          "share_of_windows": 0.373,
+          "hit_rate": 0.5229,
+          "avg_edge_claimed": 0.0555,
+          "avg_pnl_per_$1_contract": -0.0046,
+          "total_pnl_per_$1_flat": -61.74,
+          "final_bankroll_frac_kelly": 0.1699,
+          "max_drawdown": 0.9626,
           "fee_model": "kalshi",
           "assumed_quote": 0.5,
           "min_edge": 0.03
         },
         "kalshi_minedge_0.05": {
-          "trades": 5896,
-          "share_of_windows": 0.1638,
-          "hit_rate": 0.5261,
-          "avg_edge_claimed": 0.0767,
-          "avg_pnl_per_$1_contract": -0.00138,
-          "total_pnl_per_$1_flat": -8.14,
-          "final_bankroll_frac_kelly": 0.2904,
-          "max_drawdown": 0.9055,
+          "trades": 6050,
+          "share_of_windows": 0.1681,
+          "hit_rate": 0.5294,
+          "avg_edge_claimed": 0.0758,
+          "avg_pnl_per_$1_contract": 0.00192,
+          "total_pnl_per_$1_flat": 11.63,
+          "final_bankroll_frac_kelly": 0.595,
+          "max_drawdown": 0.9029,
           "fee_model": "kalshi",
           "assumed_quote": 0.5,
           "min_edge": 0.05
@@ -468,48 +461,48 @@
           "all": {
             "n": 539985,
             "base_rate": 0.5035,
-            "accuracy": 0.5138,
-            "acc_binom_pvalue_vs_0.5": 1.57e-91,
-            "brier": 0.25044,
+            "accuracy": 0.5135,
+            "acc_binom_pvalue_vs_0.5": 1.84e-88,
+            "brier": 0.2504,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.69411,
+            "log_loss": 0.69402,
             "log_loss_const": 0.69312,
-            "auc": 0.5198
+            "auc": 0.5193
           },
           "nonoverlap": {
             "n": 35999,
             "base_rate": 0.505,
-            "accuracy": 0.5152,
-            "acc_binom_pvalue_vs_0.5": 4.59e-09,
-            "brier": 0.25028,
+            "accuracy": 0.5165,
+            "acc_binom_pvalue_vs_0.5": 1.78e-10,
+            "brier": 0.25018,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.69379,
+            "log_loss": 0.69358,
             "log_loss_const": 0.6931,
-            "auc": 0.5217
+            "auc": 0.5222
           }
         },
         "hgb": {
           "all": {
             "n": 539985,
             "base_rate": 0.5035,
-            "accuracy": 0.5103,
-            "acc_binom_pvalue_vs_0.5": 3.82e-52,
-            "brier": 0.26397,
+            "accuracy": 0.5113,
+            "acc_binom_pvalue_vs_0.5": 7.83e-62,
+            "brier": 0.26428,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.72546,
+            "log_loss": 0.7262,
             "log_loss_const": 0.69312,
-            "auc": 0.5152
+            "auc": 0.515
           },
           "nonoverlap": {
             "n": 35999,
             "base_rate": 0.505,
-            "accuracy": 0.5133,
-            "acc_binom_pvalue_vs_0.5": 2.47e-07,
-            "brier": 0.26344,
+            "accuracy": 0.5132,
+            "acc_binom_pvalue_vs_0.5": 2.76e-07,
+            "brier": 0.26381,
             "brier_const_0.5": 0.25,
-            "log_loss": 0.72444,
+            "log_loss": 0.72522,
             "log_loss_const": 0.6931,
-            "auc": 0.5183
+            "auc": 0.5169
           }
         }
       },

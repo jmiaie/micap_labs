@@ -37,12 +37,12 @@ per minute on average. Resting/lagged quotes go stale fast; a pricer wired to a 
 feed harvests that — no crystal ball required.
 
 **2. ML direction ensemble** (logistic + gradient boosting, stacked & calibrated,
-31 causal features) — statistically unambiguous but economically thin:
+37 causal features) — statistically unambiguous but economically thin:
 
 | horizon | OOS accuracy (n) | p-value vs coin | acc @ confident subset | Polymarket sim | Kalshi sim |
 |---|---|---|---|---|---|
-| 5m | 51.45% (108k windows) | 8.8e-22 | 52.3% (7.6k trades @ p≥0.55) | **+1.1 to +1.5¢/$1** | **−0.3 to −0.6¢/$1** |
-| 15m | 51.36% (36k windows) | 1.3e-07 | 52.9% (6k trades @ p≥0.55) | **+0.9 to +1.9¢/$1** | ≈ breakeven |
+| 5m | 51.16% (108k windows) | 1.6e-14 | 53.7% (7.0k trades @ p≥0.55) | **+1.1 to +2.7¢/$1** | −0.6¢ to **+0.9¢/$1** @ p≥0.55 |
+| 15m | 51.37% (36k windows) | 9.6e-08 | 52.6% (5.9k trades @ p≥0.55) | **+1.4 to +1.6¢/$1** | ≈ breakeven |
 
 Trade sims assume entry vs a ~50/50 quote with 1¢ half-spread, flat $1 stakes,
 perfect fills — an upper bound. Conclusion: bars-only ML clears Polymarket's
