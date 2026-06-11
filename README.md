@@ -76,7 +76,7 @@ python scripts/paper_trade.py --venues polymarket kalshi --windows 5 15
 ```
 btc_edge/
   data/        canonical bar schema, Bitstamp/Binance fetchers, synthetic generator
-  features/    31 causal microstructure features + forward labels (lookahead-tested)
+  features/    37 causal microstructure features + forward labels (lookahead-tested)
   models/      pricer (EWMA vol + empirical-Z digital options), logistic/HGB + stacker,
                Kronos foundation-model adapter (optional)
   backtest/    purged walk-forward engine, overlap-aware metrics, pricer evaluation

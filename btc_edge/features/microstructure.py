@@ -84,6 +84,31 @@ def build_features(bars: pd.DataFrame, drop_warmup: bool = True) -> pd.DataFrame
         cvd = signed.cumsum()
         f["cvd_slope_15m"] = (cvd - cvd.shift(15)) / v.rolling(60, min_periods=30).sum().clip(lower=1e-9)
 
+    # --- classic oscillators (QuantAgent's indicator set, pandas-native) ---
+    # RSI(14), Wilder smoothing, centered to [-1, 1]
+    delta = c.diff()
+    gain = delta.clip(lower=0).ewm(alpha=1 / 14, min_periods=14).mean()
+    loss = (-delta.clip(upper=0)).ewm(alpha=1 / 14, min_periods=14).mean()
+    rsi = 100 - 100 / (1 + gain / loss.clip(lower=1e-12))
+    f["rsi_14"] = (rsi - 50.0) / 50.0
+    # MACD(12,26,9) as fractions of price (scale-free across regimes)
+    ema12 = c.ewm(span=12, min_periods=12).mean()
+    ema26 = c.ewm(span=26, min_periods=26).mean()
+    macd = ema12 - ema26
+    f["macd_rel"] = macd / c
+    f["macd_hist_rel"] = (macd - macd.ewm(span=9, min_periods=9).mean()) / c
+    # Stochastic %K/%D (14,3,3) on high/low extremes, centered
+    hh = h.rolling(14, min_periods=14).max()
+    ll = l.rolling(14, min_periods=14).min()
+    k_raw = (c - ll) / (hh - ll).clip(lower=1e-9)
+    f["stoch_k_14"] = k_raw.rolling(3, min_periods=3).mean() - 0.5
+    f["stoch_d_14"] = k_raw.rolling(3, min_periods=3).mean().rolling(3, min_periods=3).mean() - 0.5
+    # Williams %R at a longer window for scale diversity (28 bars); note the
+    # 14-bar version is an affine twin of raw %K, and ROC(k) duplicates ret_km
+    hh28 = h.rolling(28, min_periods=28).max()
+    ll28 = l.rolling(28, min_periods=28).min()
+    f["willr_28"] = (hh28 - c) / (hh28 - ll28).clip(lower=1e-9) - 0.5
+
     # --- seasonality & levels ---
     minute = f.index.minute.to_numpy()
     hour = f.index.hour.to_numpy() + minute / 60.0

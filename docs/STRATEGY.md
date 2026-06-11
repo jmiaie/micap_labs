@@ -80,6 +80,18 @@ fine-tuning. GPU recommended at live cadence.
   aggregated by a meta-learner with a risk gate, which is exactly
   `StackedDirectionModel` + `EdgeEngine`. LLM agents remain sensible for
   *event-horizon* markets (CPI prints, ETF flows, weekend gaps) — a later layer.
+- **QuantAgent** (y-research-sbu, "price-driven multi-agent LLMs for HFT") is
+  the *closest* of the agent frameworks to our domain — its agents consume only
+  k-lines/indicators, no fundamentals. Still rejected as an orchestration: each
+  decision chains 9–13 LLM calls (indicator → chart-vision pattern → trendline
+  vision → decision) at 15–30s and ~$0.025, and its own benchmarks are 1h/4h
+  bars despite the HFT title. What we **took**: its deterministic indicator
+  taxonomy (RSI-14, MACD-12/26/9, Stochastic %K/%D — now causal features
+  `rsi_14`, `macd_rel`, `macd_hist_rel`, `stoch_k_14`, `stoch_d_14`, `willr_28`
+  in `microstructure.py`; its ROC duplicates our `ret_*` family). Parked for
+  R&D: its least-squares support/resistance trendline fitter (graph_util.py)
+  as an optional feature, and the chart-image→vision-LLM signal as an *offline*
+  ensemble-member experiment (cost/latency prohibit live use).
 - **KratosMultiphysics**: finite-element multiphysics solver; no defensible
   mapping to market microstructure. Listed for completeness — not used.
 
@@ -144,4 +156,5 @@ non-overlapping windows only; trade sims charge venue-specific fees + spread.
 | TauricResearch/TradingAgents | Pattern donor (ensemble→risk-gate flow); too slow for 5m loop |
 | virattt/ai-hedge-fund | Pattern donor (signal aggregation); wrong horizon/domain |
 | 666ghj/MiroFish, jmiaie/sandfish | Narrative/social simulation engines — candidates for *event-market* layer later, not 5m BTC |
+| y-research-sbu/QuantAgent | **Indicator set adopted as features** (RSI/MACD/Stoch); trendline fitter + vision-LLM member parked for R&D; agent orchestration rejected (9–13 LLM calls/decision) |
 | KratosMultiphysics/Kratos | Not applicable (FEM solver) |
