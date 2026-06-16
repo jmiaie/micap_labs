@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Test / tooling
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Exports may contain personal message data — never commit them.
+/export/
+*.export/
+exhibit/
+demo_out/
+
+# OS
+.DS_Store
