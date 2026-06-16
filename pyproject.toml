@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "micap-imessage-export"
+version = "0.1.0"
+description = "Forensic, court-ready export of an entire iMessage/SMS conversation (PDF + HTML + JSON + SHA-256 manifest), with no third-party dependencies."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Micap Labs" }]
+keywords = ["imessage", "sms", "chat.db", "forensics", "export", "evidence", "ediscovery"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Communications :: Chat",
+    "Topic :: Utilities",
+]
+# Intentionally zero runtime dependencies: the tool uses only the standard
+# library so it runs anywhere Python does, with nothing to install or audit.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+micap-imessage-export = "imessage_export.cli:main"
+imessage-export = "imessage_export.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "tests"]
+testpaths = ["tests"]
